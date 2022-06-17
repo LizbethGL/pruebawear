@@ -1,6 +1,7 @@
 package com.example.pruebawear;
 
 import android.app.Activity;
+import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -12,37 +13,31 @@ import android.widget.TextView;
 
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
+import androidx.core.app.RemoteInput;
 
 import com.example.pruebawear.databinding.ActivityMainBinding;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
 public class MainActivity extends Activity {
 
-    private Button wBotton = null;
-    private Button wBoton;
-
-    private TextView mTextView;
+    private Button wButton = null;
     private ActivityMainBinding binding;
     private Intent intent;
-    private PendingIntent pendingIntent;
-
-    private NotificationCompat.Builder notofication;
+    private PendingIntent pendingIntent,pendingIntent2;
+    private NotificationCompat.Builder notification;
+    private NotificationCompat.Builder notification2;
     private NotificationManagerCompat nm;
     private NotificationCompat.WearableExtender wearableExtender;
 
-    String idChanel = "Mi_Canal";
     String idChannel = "Mi_Canal";
     int idNotification = 001;
-
-    private NotificationCompat.BigTextStyle bigTextStyle;
-
-
-
-    String longText = "with BigStyle, only a single line of text would be visible" +
+    private  NotificationCompat.BigTextStyle bigTextStyle;
+    String longText = "Without BigStyle, only a single line of text would be visible" +
             "Any additional text would not appear directly in the notification";
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,20 +46,23 @@ public class MainActivity extends Activity {
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        wBoton = findViewById(R.id.wButton);
-        wBotton = findViewById(R.id.wButton);
+        wButton= findViewById(R.id.wButton);
 
         intent = new Intent(MainActivity.this, MainActivity.class);
 
         nm = NotificationManagerCompat.from(MainActivity.this);
 
         wearableExtender = new NotificationCompat.WearableExtender();
-        bigTextStyle = new NotificationCompat.BigTextStyle();
+
+        bigTextStyle = new NotificationCompat.BigTextStyle().bigText(longText);
+
+        wButton.setOnClickListener(new View.OnClickListener() {
 
 
-        wBotton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
 
-                public void start(View view){
+/*
                 Timer t = new Timer();
                 TimerTask tt = new TimerTask() {
                     @Override
@@ -77,56 +75,86 @@ public class MainActivity extends Activity {
 
                         pendingIntent = PendingIntent.getActivity(MainActivity.this, 0, intent, 0);
 
-                        notofication = new NotificationCompat.Builder(MainActivity.this, idChannel)
+                        notification = new NotificationCompat.Builder(MainActivity.this, idChannel)
                                 .setSmallIcon(R.mipmap.ic_launcher)
                                 .setContentTitle("Mi notification")
-                                .setContentText("Mi segunda notificacion wear")
+                                .setContentText("Mi Segunda notificacion wear")
                                 .extend(wearableExtender);
-                        nm.notify(idNotification, notofication.build());
+                        nm.notify(idNotification, notification.build());
                     }
                 };
+                t.schedule(tt, 6000);
 
-                t.schedule(tt, 5000);
+ */
 
-            }
-
-                @Override
-                public void onClick (View view){
-                start(view);
                 int importance = NotificationManager.IMPORTANCE_HIGH;
-                String name = "Notificacion";
+                String name = "Notification";
 
-                NotificationChannel notificationChannel =
-                        new NotificationChannel(idChanel, name, importance);
-                String name1 = "Notification";
-                NotificationChannel notificationChannel1 = new NotificationChannel(idChannel, name, importance);
+                NotificationChannel notificationChannel = new NotificationChannel(idChannel, name, importance);
 
                 nm.createNotificationChannel(notificationChannel);
 
-                pendingIntent = pendingIntent.getActivity(MainActivity.this, 0, intent, 0);
-                pendingIntent = PendingIntent.getActivity(MainActivity.this, 0, intent, 0);
 
-                /*notification = new NotificationCompat.Builder(MainActivity.this, idChanel)
-                notification = new NotificationCompat.Builder(MainActivity.this, idChannel)
-                        .setSmallIcon(R.mipmap.ic_launcher)
-                        .setContentTitle("Notificacion Wear")
-                        .setContentText(longText)
-                        .setContentIntent(pendingIntent)
-                        .extend(wearableExtender)
-                        .setVibrate(new long[]{100,200,300,400,500,300,200,400})
-                        .setStyle(bigTextStyle);
-                nm.notify(idNotification, notification.build());*/
+           /*     pendingIntent = PendingIntent.getActivity(MainActivity.this,0,intent,PendingIntent.FLAG_UPDATE_CURRENT);
 
-                notofication = new NotificationCompat.Builder(MainActivity.this, idChanel)
+
+                notification = new NotificationCompat.Builder( MainActivity.this,idChannel)
                         .setSmallIcon(R.mipmap.ic_launcher)
-                        .setContentTitle("Mi notificacion")
-                        .setContentTitle("Mi notification")
-                        .setContentText("Mi primera notificacion wear")
-                        .extend(wearableExtender);
-                nm.notify(idNotification, notofication.build());
+                        .setContentTitle("Acción Estandar")
+                        .setContentText("Notificación con acción estandar")
+                        .setContentIntent(pendingIntent);
+
+               nm.notify(idNotification,notification.build());
+*/
+
+
+                pendingIntent2 = PendingIntent.getActivity(MainActivity.this,0,intent,PendingIntent.FLAG_UPDATE_CURRENT);
+
+
+                // Create the reply action and add the remote input
+                RemoteInput remoteInput = null;
+                PendingIntent replyPendingIntent = null;
+                NotificationCompat.Action action =
+                        new NotificationCompat.Action.Builder(com.google.android.gms.base.R.drawable.common_full_open_on_phone,
+                                getString(androidx.constraintlayout.widget.R.string.abc_menu_enter_shortcut_label), replyPendingIntent)
+                                .addRemoteInput(remoteInput)
+                                // 1) allow generated replies
+                                .setAllowGeneratedReplies(true)
+                                .build();
+
+                notification = new NotificationCompat.Builder( MainActivity.this,idChannel)
+                        .setSmallIcon(R.mipmap.ic_launcher)
+                        .setContentTitle("Notificación Multi-acción")
+                        .setContentText("Notificaciones")
+                        .setContentIntent(pendingIntent2);
+
+                nm.notify(idNotification,notification.addAction(action).build());
+
+
             }
-            });
+        });
+/*
+        //paginas
+        List<Notification> pages = new ArrayList<Notification>();
 
+        for(int i=1;i>3;i++){
+            Notification nt
+                    = new NotificationCompat.Builder(MainActivity.this,idChannel)
+                    .setContentTitle("Pagina" + i)
+                    .setContentText("Texto de la página")
+                    .build();
+            pages.add(nt);
         }
-    }
 
+
+        NotificationCompat.WearableExtender extender = new NotificationCompat.WearableExtender().addPages(pages);
+
+        Notification notification
+                = new NotificationCompat.Builder(MainActivity.this,idChannel)
+                .setContentTitle("Notificación multipagina")
+                .setContentText("Esta es la primera Pagina")
+                .build();
+                 */
+
+    }
+}
